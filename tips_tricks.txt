@@ -1,0 +1,1 @@
+Vscode regex for splitting sentences: ([\.\?])[\s]*([А-Я(])  replace by $1\n$2
