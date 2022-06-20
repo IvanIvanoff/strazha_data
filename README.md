@@ -1,21 +1,9 @@
 # StrazhaData
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `strazha_data` to your list of dependencies in `mix.exs`:
-
 ```elixir
-def deps do
-  [
-    {:strazha_data, "~> 0.1.0"}
-  ]
-end
+mix escript.build && ./strazha_data --filename=people.csv --mode=members_of_parliament
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/strazha_data>.
-
+```elixir
+mix escript.build && ./strazha_data --filename=speeches.csv --size=100 --mode=speeches
+```

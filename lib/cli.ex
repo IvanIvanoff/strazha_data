@@ -11,6 +11,20 @@ defmodule StrazhaData.Cli do
   end
 
   defp get_members_of_parliament(opts) do
+    members_of_parliament = StrazhaData.ParliamentGroup.get_members_of_parliament()
+
+    data =
+      Enum.map(members_of_parliament, fn map ->
+        [map.first_name, map.middle_name, map.last_name, map.slug]
+      end)
+
+    headers = ["first_name", "middle_name", "last_name", "slug"]
+    csv_data = [headers] ++ data
+
+    File.cd!("./data/people")
+    filename = opts[:filename]
+    StrazhaData.CsvExporter.export(filename, csv_data)
+    File.cd!("../../")
   end
 
   defp get_speeches(opts) do
@@ -42,10 +56,10 @@ defmodule StrazhaData.Cli do
 
       csv_data = [headers] ++ data
 
-      File.cd!("./data")
+      File.cd!("./data/speeches")
       filename = "chunk_#{index}_" <> opts[:filename]
       StrazhaData.CsvExporter.export(filename, csv_data)
-      File.cd!("../")
+      File.cd!("../../")
     end)
   end
 end

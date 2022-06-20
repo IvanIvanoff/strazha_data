@@ -1,4 +1,4 @@
-defmodule Strazha.ParliamentGroup do
+defmodule StrazhaData.ParliamentGroup do
   # /46-ima-takuv-narod/index.json
   @base_url "https://strazha-data2.eu-central-1.linodeobjects.com/parl-groups"
   def run() do
@@ -19,9 +19,9 @@ defmodule Strazha.ParliamentGroup do
 
           Enum.map(persons, fn p ->
             %{
-              first: p["firstName"],
-              middle: p["middleName"],
-              last: p["lastName"],
+              first_name: p["firstName"],
+              middle_name: p["middleName"],
+              last_name: p["lastName"],
               slug: p["slug"]
             }
           end)
@@ -30,6 +30,7 @@ defmodule Strazha.ParliamentGroup do
           raise(error)
       end
     end)
+    |> List.flatten()
   end
 
   defp get_data() do
