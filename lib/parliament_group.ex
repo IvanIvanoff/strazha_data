@@ -5,32 +5,46 @@ defmodule StrazhaData.ParliamentGroup do
     get_data()
   end
 
-  def get_members_of_parliament() do
+  def list_parliament_groups() do
     get_data()[:parliament_group_slugs]
-    |> Enum.map(& &1["slug"])
-    |> Enum.map(fn slug ->
-      url = Path.join([@base_url, slug, "index.json"])
+  end
 
-      result = HTTPoison.get(url)
+  def get_members_of_parliament() do
+    # get_data()[:parliament_group_slugs]
 
-      case result do
-        {:ok, %{body: body, status_code: 200}} ->
-          %{"persons" => persons} = Jason.decode!(body)
+    # |> Enum.map(& &1["slug"])
 
-          Enum.map(persons, fn p ->
-            %{
-              first_name: p["firstName"],
-              middle_name: p["middleName"],
-              last_name: p["lastName"],
-              slug: p["slug"]
-            }
-          end)
+    data =
+      ["47-ima-takuv-narod"]
+      |> Enum.map(fn slug ->
+        url = Path.join([@base_url, slug, "index.json"])
 
-        error ->
-          raise(error)
-      end
-    end)
-    |> List.flatten()
+        result = HTTPoison.get(url)
+
+        case result do
+          {:ok, %{body: body, status_code: 200}} ->
+            %{"persons" => persons} = Jason.decode!(body)
+
+            Enum.map(persons, fn p ->
+              %{
+                first_name: p["firstName"],
+                middle_name: p["middleName"],
+                last_name: p["lastName"],
+                # slug: p["slug"],
+                email: p["email"] |> hd()
+              }
+            end)
+
+          error ->
+            raise(error)
+        end
+      end)
+      |> List.flatten()
+
+    headers = ["firstName", "middleName", "lastName", "email"]
+    rows = Enum.map(data, &[&1.first_name, &1.middle_name, &1.last_name, &1.email])
+
+    StrazhaData.CsvExporter.export("itn_members_with_emails.csv", [headers] ++ rows)
   end
 
   defp get_data() do

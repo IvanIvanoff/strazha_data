@@ -2,7 +2,7 @@ defmodule StrazhaData.ConllToCsv do
   def run() do
     # Drop the first line
     file_stream =
-      File.stream!("./data/conll/ner.conll")
+      File.stream!("./data/conll/extended_ner.conll")
       |> Stream.drop(1)
       |> Stream.drop(-1)
 
@@ -22,7 +22,7 @@ defmodule StrazhaData.ConllToCsv do
     IO.inspect(Enum.take(rows, 100))
     headers = ["sentence_idx", "word", "tag"]
 
-    StrazhaData.CsvExporter.export("example_csv_ner.csv", [headers] ++ rows)
+    StrazhaData.CsvExporter.export("ner.csv", [headers] ++ rows)
   end
 
   defp line_to_csv_row("\n", _previous_tag) do
@@ -42,14 +42,15 @@ defmodule StrazhaData.ConllToCsv do
       "*" when previous_tag == "O" -> %{tag: "O", is_end_tag: true}
       "*" when previous_tag != "O" -> %{tag: continue_tag(previous_tag), is_end_tag: false}
       "*)" when previous_tag != "O" -> %{tag: continue_tag(previous_tag), is_end_tag: true}
+      "*)" when previous_tag == "O" -> %{tag: "O", is_end_tag: true}
       "(PER*" -> %{tag: "B-PER", is_end_tag: false}
       "(PER)" -> %{tag: "B-PER", is_end_tag: true}
       "(ORG*" -> %{tag: "B-ORG", is_end_tag: false}
       "(ORG)" -> %{tag: "B-ORG", is_end_tag: true}
       "(LOC*" -> %{tag: "B-LOC", is_end_tag: false}
       "(LOC)" -> %{tag: "B-LOC", is_end_tag: true}
-      "(OTH*" -> %{tag: "B-OTH", is_end_tag: false}
-      "(OTH)" -> %{tag: "B-OTH", is_end_tag: true}
+      "(OTH*" -> %{tag: "O", is_end_tag: true}
+      "(OTH)" -> %{tag: "O", is_end_tag: true}
     end
   end
 
